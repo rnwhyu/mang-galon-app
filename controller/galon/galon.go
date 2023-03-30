@@ -7,7 +7,6 @@ import (
 	"galon-app/models"
 	token "galon-app/utils"
 	"net/http"
-	"reflect"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -23,16 +22,21 @@ func Add(c *gin.Context) {
 		return
 	}
 	claims, err := token.ExtractTokenClaims(c)
+	if err != nil {
+		controller.ApiErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
 	fmt.Println(claims)
 
-	roleID, _ := claims["role_id"].(int)
-	fmt.Println(reflect.TypeOf(roleID))
-	if roleID != 1 {
-		controller.ApiErrorResponse(c, http.StatusBadRequest, err.Error())
+	roleID, _ := claims["role_id"].(float64)
+	if int(roleID) != enum.SELLER {
+		controller.ApiErrorResponse(c, http.StatusForbidden, "Invalid Access")
 		return
 	}
 
 	galon := models.Galon{}
+	galon.Brandname=req.Brandname
+	galon.Stock=req.Stock
 	err = galon.AddStock()
 	if err != nil {
 		controller.ApiErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -62,13 +66,20 @@ func Update(c *gin.Context) {
 		return
 	}
 	claims, err := token.ExtractTokenClaims(c)
-	roleID := claims["role_id"]
-	if roleID != enum.SELLER {
-		controller.ApiErrorResponse(c, http.StatusBadRequest, err.Error())
+	if err != nil {
+		controller.ApiErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	fmt.Println(claims)
+
+	roleID, _ := claims["role_id"].(float64)
+	if int(roleID) != enum.SELLER {
+		controller.ApiErrorResponse(c, http.StatusForbidden, "Invalid Access")
 		return
 	}
 	galon := models.Galon{}
 	galon.ID = id
+	galon.Stock=request.Stock
 	err = galon.UpdateStock()
 	if err != nil {
 		controller.ApiErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -91,9 +102,15 @@ func Delete(c *gin.Context) {
 	}
 	galon := models.Galon{ID: id}
 	claims, err := token.ExtractTokenClaims(c)
-	roleID := claims["role_id"]
-	if roleID != enum.SELLER {
-		controller.ApiErrorResponse(c, http.StatusBadRequest, err.Error())
+	if err != nil {
+		controller.ApiErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	fmt.Println(claims)
+
+	roleID, _ := claims["role_id"].(float64)
+	if int(roleID) != enum.SELLER {
+		controller.ApiErrorResponse(c, http.StatusForbidden, "Invalid Access")
 		return
 	}
 	err = galon.DeleteGalon()
@@ -102,4 +119,13 @@ func Delete(c *gin.Context) {
 		return
 	}
 	controller.ApiResponse(c, http.StatusOK, fmt.Sprintf("Galon #%d deleted successfully", galon.ID))
+}
+func GetAll(c *gin.Context){
+	galon :=models.Gallons{}
+	err := galon.GetAll()
+	if err !=nil{
+		controller.ApiErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	controller.ApiResponse(c, http.StatusOK, "Success", galon)
 }

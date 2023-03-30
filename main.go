@@ -56,6 +56,7 @@ func main() {
 	protected.POST("/user/galon", galon.Add)
 	protected.PUT("/user/galon/:id", galon.Update)
 	protected.DELETE("/user/galon/:id", galon.Delete)
+	protected.GET("/user/galon", galon.GetAll)
 
 	r.Run(":" + os.Getenv("PORT"))
 }

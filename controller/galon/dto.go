@@ -9,5 +9,6 @@ type GalonFindReq struct{
 }
 type GalonUpdateReq struct{
 	GalonFindReq
-	GalonAddReq
+	Stock int `json:"stock" binding:"required"`
+	//GalonAddReq
 }
