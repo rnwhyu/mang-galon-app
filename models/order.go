@@ -52,12 +52,9 @@ func (o *Order) UpdateStatus() error {
 	}
 	return nil
 }
-
-type Orders []Order
-
-func (o *Order) GetByUserId() error {
-	sqlStatement := `SELECT * FROM orders WHERE user_id = $1`
-	err := database.DB.QueryRow(sqlStatement, o.UserID).
+func (o *Order) GetById() error {
+	sqlStatement := `SELECT * FROM orders WHERE id = $1`
+	err := database.DB.QueryRow(sqlStatement, o.ID).
 		Scan(&o.ID,
 			&o.UserID,
 			&o.GalonID,
@@ -65,13 +62,40 @@ func (o *Order) GetByUserId() error {
 			&o.Status,
 			&o.UpdatedAt,
 			&o.CreatedAt)
+
 	if err != nil {
 		return err
 	}
 	return nil
 }
+
+type Orders []Order
+
+func (o *Orders) GetByUserId(userID int) error {
+	sqlStatement := `SELECT * FROM orders WHERE user_id = $1 ORDER BY id DESC`
+	rows, err := database.DB.Query(sqlStatement, userID)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var order = Order{}
+		err = rows.Scan(
+			&order.UserID,
+			&order.GalonID,
+			&order.TotalOrder,
+			&order.Status,
+			&order.UpdatedAt,
+			&order.CreatedAt)
+		if err != nil {
+			return err
+		}
+		*o = append(*o, order)
+	}
+	return nil
+}
 func (o *Orders) GetAll() error {
-	sqlStatement := `SELECT * FROM orders ORDER BY id`
+	sqlStatement := `SELECT * FROM orders ORDER BY id DESC`
 	rows, err := database.DB.Query(sqlStatement)
 	if err != nil {
 		return err
