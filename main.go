@@ -3,11 +3,8 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"galon-app/controller"
-	"galon-app/controller/galon"
-	"galon-app/controller/order"
 	"galon-app/database"
-	"galon-app/middlewares"
+	"galon-app/router"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -34,6 +31,12 @@ func main() {
 		os.Getenv("DB_USER"),
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_NAME"))
+
+	// os.Getenv("PGHOST"),
+	// 	os.Getenv("PGPORT"),
+	// 	os.Getenv("PGUSER"),
+	// 	os.Getenv("PGPASSWORD"),
+	// 	os.Getenv("PGDATABASE"))
 	fmt.Println(psqlInfo)
 	DB, err = sql.Open("postgres", psqlInfo)
 	if err != nil {
@@ -49,17 +52,5 @@ func main() {
 	defer DB.Close()
 
 	r := gin.Default()
-	r.POST("/register", controller.Register)
-	r.POST("/login", controller.Login)
-	protected := r.Group("/admin")
-	protected.Use(middlewares.JwtAuthMiddleware())
-	protected.GET("/user", controller.CurrentUser)
-	protected.POST("/user/galon", galon.Add)
-	protected.PUT("/user/galon/:id", galon.Update)
-	protected.DELETE("/user/galon/:id", galon.Delete)
-	protected.GET("/user/galon", galon.GetAll)
-	protected.POST("user/order", order.Make)
-	protected.PUT("user/order/:id", order.Update)
-
-	r.Run(":" + os.Getenv("PORT"))
+	router.Setup(r)
 }
