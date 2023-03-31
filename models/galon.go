@@ -80,3 +80,13 @@ func (g *Gallons) GetAll() error {
 
 	return nil
 }
+func (g *Galon) GetById() error {
+	sqlStatement := `SELECT * FROM item_galon WHERE id = $1`
+	err := database.DB.QueryRow(sqlStatement, g.ID).
+		Scan(&g.ID, &g.Brandname, &g.Stock, &g.UpdatestockAt, &g.CreatedAt)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}

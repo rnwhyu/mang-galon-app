@@ -35,8 +35,8 @@ func Add(c *gin.Context) {
 	}
 
 	galon := models.Galon{}
-	galon.Brandname=req.Brandname
-	galon.Stock=req.Stock
+	galon.Brandname = req.Brandname
+	galon.Stock = req.Stock
 	err = galon.AddStock()
 	if err != nil {
 		controller.ApiErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -79,7 +79,7 @@ func Update(c *gin.Context) {
 	}
 	galon := models.Galon{}
 	galon.ID = id
-	galon.Stock=request.Stock
+	galon.Stock = request.Stock
 	err = galon.UpdateStock()
 	if err != nil {
 		controller.ApiErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -120,12 +120,34 @@ func Delete(c *gin.Context) {
 	}
 	controller.ApiResponse(c, http.StatusOK, fmt.Sprintf("Galon #%d deleted successfully", galon.ID))
 }
-func GetAll(c *gin.Context){
-	galon :=models.Gallons{}
+func GetAll(c *gin.Context) {
+	galon := models.Gallons{}
 	err := galon.GetAll()
-	if err !=nil{
+	if err != nil {
 		controller.ApiErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 	controller.ApiResponse(c, http.StatusOK, "Success", galon)
+}
+func FindById(c *gin.Context) {
+	var galonId GalonFindReq
+
+	err := c.ShouldBindUri(&galonId)
+	if err != nil {
+		controller.ApiErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	id, err := strconv.Atoi(galonId.ID)
+	if err != nil {
+		controller.ApiErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	galon := models.Galon{ID: id}
+	err = galon.GetById()
+	if err != nil {
+		controller.ApiErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	controller.ApiResponse(c, http.StatusOK, "Success", galon)
+
 }
