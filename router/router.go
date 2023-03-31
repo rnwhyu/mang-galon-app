@@ -14,20 +14,25 @@ func Setup(r *gin.Engine) {
 	r.POST("/register", controller.Register)
 	r.POST("/login", controller.Login)
 
-	protected := r.Group("/admin")
-	protected.Use(middlewares.JwtAuthMiddleware())
+	r.GET("/user", middlewares.JwtAuthMiddleware(), controller.CurrentUser)
 
-	protected.GET("/user", controller.CurrentUser)
-	protected.POST("/user/galon", galon.Add)
-	protected.PUT("/user/galon/:id", galon.Update)
-	protected.DELETE("/user/galon/:id", galon.Delete)
-	protected.GET("/user/galon", galon.GetAll)
+	galonRoute := r.Group("/galon", middlewares.JwtAuthMiddleware())
 
-	protected.POST("user/order", order.Make)
-	protected.PUT("user/order/:id/processing", order.UpdateProcessing)
-	protected.PUT("user/order/:id/on-delivery", order.UpdateDelivery)
-	protected.PUT("user/order/:id/delivered", order.UpdateDelivered)
-	protected.PUT("user/order/:id/completed", order.UpdateCompleted)
+	galonRoute.POST("/", galon.Add)
+	galonRoute.PUT("/:id", galon.Update)
+	galonRoute.DELETE("/:id", galon.Delete)
+	galonRoute.GET("/", galon.GetAll)
+
+	orderRoute := r.Group("/order", middlewares.JwtAuthMiddleware())
+
+	orderRoute.POST("/", order.Make)
+	orderRoute.PUT("/:id/processing", order.UpdateProcessing)
+	orderRoute.PUT("/:id/on-delivery", order.UpdateDelivery)
+	orderRoute.PUT("/:id/delivered", order.UpdateDelivered)
+	orderRoute.PUT("/:id/completed", order.UpdateCompleted)
+	orderRoute.DELETE("/:id/cancel", order.UpdateCanceled)
+	orderRoute.GET("/", order.GetAll)
+	orderRoute.GET("/user", order.GetByUserId)
 
 	r.Run(":" + os.Getenv("PORT"))
 }

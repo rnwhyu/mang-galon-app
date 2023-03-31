@@ -86,6 +86,6 @@ func ExtractTokenClaims(c *gin.Context) (claims jwt.MapClaims, err error) {
 		}
 		return []byte(os.Getenv("API_SECRET")), nil
 	})
-	fmt.Println(tokenString, claims)
+
 	return claims, err
 }
