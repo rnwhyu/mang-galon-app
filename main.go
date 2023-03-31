@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"galon-app/controller"
 	"galon-app/controller/galon"
+	"galon-app/controller/order"
 	"galon-app/database"
 	"galon-app/middlewares"
 	"os"
@@ -57,6 +58,8 @@ func main() {
 	protected.PUT("/user/galon/:id", galon.Update)
 	protected.DELETE("/user/galon/:id", galon.Delete)
 	protected.GET("/user/galon", galon.GetAll)
+	protected.POST("user/order", order.Make)
+	protected.PUT("user/order/:id", order.Update)
 
 	r.Run(":" + os.Getenv("PORT"))
 }
