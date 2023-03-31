@@ -10,7 +10,6 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	//jwt "github.com/golang-jwt/jwt/request"
 )
 
 func Add(c *gin.Context) {
@@ -26,7 +25,6 @@ func Add(c *gin.Context) {
 		controller.ApiErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	fmt.Println(claims)
 
 	roleID, _ := claims["role_id"].(float64)
 	if int(roleID) != enum.SELLER {
@@ -70,7 +68,6 @@ func Update(c *gin.Context) {
 		controller.ApiErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	fmt.Println(claims)
 
 	roleID, _ := claims["role_id"].(float64)
 	if int(roleID) != enum.SELLER {
@@ -106,7 +103,6 @@ func Delete(c *gin.Context) {
 		controller.ApiErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	fmt.Println(claims)
 
 	roleID, _ := claims["role_id"].(float64)
 	if int(roleID) != enum.SELLER {
