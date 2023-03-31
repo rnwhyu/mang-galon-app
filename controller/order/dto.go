@@ -11,5 +11,4 @@ type OrderFindReq struct {
 }
 type OrderUpdateReq struct {
 	OrderFindReq
-	Status string `json:"status" binding:"required"`
 }
