@@ -81,6 +81,7 @@ func (o *Orders) GetByUserId(userID int) error {
 	for rows.Next() {
 		var order = Order{}
 		err = rows.Scan(
+			&order.ID,
 			&order.UserID,
 			&order.GalonID,
 			&order.TotalOrder,
@@ -104,6 +105,7 @@ func (o *Orders) GetAll() error {
 	for rows.Next() {
 		var order = Order{}
 		err = rows.Scan(
+			&order.ID,
 			&order.UserID,
 			&order.GalonID,
 			&order.TotalOrder,
